@@ -1,0 +1,511 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <title>Offer Onboarding</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css">
+        <link rel="stylesheet" href="offeronboarding.css">
+    </head>
+    <body>
+        <a id="back-button" style="display:none;">
+            <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
+            Go Back
+        </a>
+        <div class="mainContent">
+
+            
+            <div id="welcome">
+                <center>
+                    <p class="lead">Onboarding scopes into AAD and/or MSA</p>
+                    <p class="subtext">These instructions will help you determine the steps you need to take to expose new scopes (a.k.a. offers or actions) into the Azure AD and/or Microsoft Account systems.</p>
+                    <p class="subtext">Note that some of the steps provided here can be performed in parallel, but most are serialized.  We recommend that you click through the entire flow to understand the required steps, and then come back to the beginning to actually execute the steps.  Use your best judgement to determine which steps you might be able to perform in parallel.</p>
+                    <br />
+                    <button id="btn-start" class="btn btn-primary continue">Start</button>
+                </center>
+            </div>
+
+            <div id="docs" style="display:none;">
+                <center>
+                    <p class="lead">Read the documentation</p>
+                    <p class="subtext">
+                        There are several resources available to help you further understand scopes, offers, delegated permissions, and OAuth.  Here are a few that we recommend:
+                    </p>
+
+                    <ul class="subtext subtext-list">
+                        <li><a href="https://microsoft-my.sharepoint.com/personal/dkershaw_microsoft_com/_layouts/15/WopiFrame.aspx?sourcedoc=%7b4b1b3c57-23a5-49a3-83d9-eb8666d7e016%7d&action=edit&wd=target%28Specs.one%7c073A6B02-8862-4FCA-BFC2-F21820BBDFD0/Consent%20specs%7c0F0A4B7D-65D6-49AE-9416-C44049DDB282/%29">Principles of permissions from the Microsoft Graph team.</a></li>
+                        <li><a href="https://msft.spoppe.com/sites/directoryfederation/_layouts/15/WopiFrame.aspx?sourcedoc=%7bc3dbd06b-327d-4f5c-8b1b-f1511f774923%7d&action=edit&wd=target%28Directory%20Federation%20-%20aka%20Microsoft%20Graph.one%7cCA38684C-4082-4045-A932-BE7D619F8C9C/Consent%20permission%20scopes%20model%20and%20scopes%20list%7c8B3448AC-091D-4B6F-AB3D-984350FB5DE1/%29">Guidelines for scopes in the Microsoft Graph.</a></li>
+                        <li><a href="https://azure.microsoft.com/documentation/articles/active-directory-v2-scopes/">Azure AD's intoduction to scopes, permissions, and consent.</a></li>
+                        <li><a href="https://tools.ietf.org/html/rfc6749">The OAuth 2.0 specification.</a></li>
+                    </ul>
+                    <p class="subtext">
+                        While all of these documents may not exactly pertain to your scenario, they will give you a general feel for why you might to onboard a new scope.  If you are already familiar with OAuth and know what you're doing, feel free to proceed.
+                    </p>
+                    <br />
+                    <button id="btn-docs" class="btn btn-primary continue">Continue, I know what I'm doing</button>
+                </center>
+            </div>
+
+            <div id="define" style="display:none;">
+                <center>
+                    <p class="lead">Define your scopes</p>
+                    <p class="subtext">
+                        Now that you understand OAuth, tell us the values of your new scope(s).  Typically they should take the format <code>{entity}.{action}</code>.  More detail on scope format is available in the documentation in the previous step.
+                    </p>
+                    <p>
+                        Please enter your scopes below.  If you are onboarding more than one scope, <strong>space-delimit</strong> each scope.
+                    </p>
+                    <br />
+
+                    <div class="strings subtext">
+                        <form>
+                            <div class="form-group" id="scopes">
+                                <div>
+                                    <input id="scopes" type="text" class="form-control" placeholder="for instance, mail.read mail.send mail.readwrite" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <button id="btn-define" class="btn btn-primary">Continue</button>
+                </center>
+            </div>
+
+            <div id="msa-users-enabled" style="display:none;">
+                <center>
+                    <p class="lead">Should your scope be available to <mark>MSA</mark> users?</p>
+                    <p class="subtext">
+                        Do you expect that MSA users should be able to grant consent for other applications to access your scope? If you click yes, we will walk you through the steps to onboard into the MSA system.
+                    </p>
+                    <br />
+                    <button id="btn-msa-users-enabled" class="btn btn-success">Yes</button>
+                    <button id="btn-msa-users-disabled" class="btn btn-danger">No</button>
+                </center>
+            </div>
+
+            <div id="aad-users-enabled" style="display:none;">
+                <center>
+                    <p class="lead">Should your scope be available to <mark>AAD</mark> users?</p>
+                    <p class="subtext">
+                        Do you expect that Azure AD users should be able to grant consent for other applications to access your scope? If you click yes, we will walk you through the steps to onboard into the Azure AD system.
+                    </p>
+                    <br />
+                    <button id="btn-aad-users-enabled" class="btn btn-success">Yes</button>
+                    <button id="btn-aad-users-disabled" class="btn btn-danger">No</button>
+                </center>
+            </div>
+            
+            <div id="error-no-users" style="display:none;">
+                <center>
+                    <p class="lead">Well, who can use your new scope then?</p>
+                </center>
+            </div>
+
+            <div id="aad-register" style="display:none;">
+                <center>
+                    <p class="lead">Register an app with AAD</p>
+                    <p class="subtext">
+                        Now you need to register a 1st party application with Azure AD and get a 1st party client ID for your service.  If you already have a 1st party application registered in AAD, you should re-use that app.
+                    </p>
+                    <br />                    
+
+                    <p class="subtext">
+                        The Azure AD 1st party onboarding process has extensive documentation, rules, and guidelines.  If this is your first time onboarding to Azure AD, you should begin at <a href="http://aka.ms/aadonboarding">the AAD Onboarding Wiki</a>.  Note that onboarding to Azure AD can take several weeks to complete.
+                    </p>
+
+                    <button id="btn-aad-register" class="btn btn-primary">I have registered a 1st party Azure AD app</button>
+                </center>
+            </div>
+
+            <div id="permission-type" style="display:none;">
+                <center>
+                    <p class="lead">What type of AAD permission(s) are you creating?</p>
+                    <p class="subtext">
+                        Azure AD has two types of permissions: <strong>Application Permissions</strong> (a.k.a. app roles) and <strong>Delegated Permissions</strong> (a.k.a. scopes or oAuth2Permissions).  Most services will use delegated permissions.  If you do not understand the difference, please review the documentation & code samples at <a href="http://aka.ms/aaddev">aka.ms/aaddev</a>.
+                    </p>
+                    <br />
+                    
+                    <button id="btn-app-only" class="btn btn-default">Application Permissions</button>
+                    <button id="btn-delegated" class="btn btn-default">Delegated Permissions</button>
+                </center>
+               </div>
+
+            <div id="admin-only" style="display:none;">
+                <center>
+                    <p class="lead">Which Azure AD users should be able to consent to your scope(s)?</p>
+                    <p class="subtext">
+                        When you expose a scope through AAD, you can optionally choose to restrict the permission to only administrative consent.  If you choose <strong>Only Admins</strong> below, regular Azure AD users will not be able to consent to the scope, and will receieve and error.  Admin-only scopes should be reserved for permissions that are particularly high-privileged.
+                    </p>
+                    <br />
+                    
+                    <button id="btn-admin-only-false" class="btn btn-default">All Users</button>
+                    <button id="btn-admin-only-true" class="btn btn-default">Only Admins</button>
+                </center>
+            </div>
+
+            <div id="enter-strings" style="display:none;">
+                <center>
+                    
+                    <div class="container strings">
+                        <p class="lead">Please enter your strings for scope <mark id="scope"></mark>:</p>
+                        <p class="subtext">
+                            Fill out the strings below, which will be used to describe your permission to customers.  Please note that <strong>none of this information is saved anywhere</strong>, so we reccommend you record these strings elsewhere for later use.  These instructions don't actually submit your strings to any process, they simply help you navigate the onboarding process.
+                        </p>
+                        <br />
+                        
+                        <form class="form-horizontal">
+                            <div class="form-group" style="display:none;" id="resource-display-name">
+                                <label data-toggle="tooltip" data-placement="bottom" title="A friendly string that will identify your service to developers, admins, and end-users alike." class="col-sm-4 control-label" for="resource-display-name">Resource Display Name</label>
+                                <div class="col-sm-8">
+                                    <input id="resource-display-name" type="text" class="form-control" placeholder="Microsoft Outlook APIs" />
+                                </div>
+                            </div>
+                            <div class="form-group" style="display:none;" id="app-only-display-name">
+                                <label class="col-sm-4 control-label" for="app-only-display-name" data-toggle="tooltip" data-placement="bottom" title="A short string that will describe the permission to developers and administrators.  It needs to be short enough to display on the Azure AD consent screen.">App Only Display Name</label>
+                                <div class="col-sm-8">
+                                    <input id="app-only-display-name" type="text" class="form-control" placeholder="Read mail in all mailboxes" />
+                                </div>
+                            </div>
+                            <div class="form-group" style="display:none;" id="app-only-description">
+                                <label class="col-sm-4 control-label" for="app-only-description" data-toggle="tooltip" data-placement="bottom" title="A longer string that will describe the permission to developers and administrators.  Will be displayed in Azure AD portals.">App Only Description</label>
+                                <div class="col-sm-8">
+                                    <input id="app-only-description" type="text" class="form-control" placeholder="Allows the app to read mail in all mailboxes without a signed-in user." />
+                                </div>
+                            </div>
+                            <div class="form-group" style="display:none;" id="admin-display-name">
+                                <label class="col-sm-4 control-label" for="admin-display-name"  data-toggle="tooltip" data-placement="bottom" title="A short string that will describe the permission to developers and administrators.  It needs to be short enough to display on the Azure AD consent screen.">Admin Display Name</label>
+                                <div class="col-sm-8">
+                                    <input id="admin-display-name" type="text" class="form-control" placeholder="Read user mail" />
+                                </div>
+                            </div>
+                            <div class="form-group" style="display:none;" id="admin-description">
+                                <label class="col-sm-4 control-label" for="admin-description" data-toggle="tooltip" data-placement="bottom" title="A longer string that will describe the permission to developers and administrators.  Will be displayed in Azure AD portals.">Admin Description</label>
+                                <div class="col-sm-8">
+                                    <input id="admin-description" type="text" class="form-control" placeholder="Allows the app to read email in user mailboxes." />
+                                </div>
+                            </div>
+                            <div class="form-group" style="display:none;" id="user-display-name">
+                                <label class="col-sm-4 control-label" for="user-display-name" data-toggle="tooltip" data-placement="bottom" title="A short string that will describe the permission to end-users.  It needs to be short enough to display on consent screens.">User Display Name</label>
+                                <div class="col-sm-8">
+                                    <input id="user-display-name" type="text" class="form-control" placeholder="Read your mail" />
+                                </div>
+                            </div>
+                            <div class="form-group" style="display:none;" id="user-description">
+                                <label class="col-sm-4 control-label" for="user-description" data-toggle="tooltip" data-placement="bottom" title="A longer string that will describe the permission to end-users.  Will be displayed in consent screens and account management portals.">User Description</label>
+                                <div class="col-sm-8">
+                                    <input id="user-description" type="text" class="form-control" placeholder="Allows the app to read email in your mailbox." />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <button id="btn-enter-string" class="btn btn-primary btn-enter-string">Next</button>
+                </center>
+            </div>
+
+            <div id="ms-graph" style="display:none;">
+                <center>
+                    <p class="lead">Will your permission be exposed via the <a href="https://graph.microsoft.io">Microsoft Graph?</a></p>
+                    <p class="subtext">
+                       Onboarding to the Microsoft Graph requires working closely with the Microsoft Graph to meet all of their requirements and to accept tokens from the Microsoft Graph aggregator service.  Note that if your intention is for your service to be exposed via the converged v2.0 auth endpoint, you <strong>must</strong> onboard to the Microsoft Graph.
+                    </p>
+                    <br />
+                    <button id="btn-ms-graph-true" class="btn btn-success">Yes</button>
+                    <button id="btn-ms-graph-false" class="btn btn-danger">No</button>
+                </center>
+            </div>
+
+            <div id="spreadsheet-table" style="display:none;">
+                <center>
+                    <p class="lead">Add your permissions to the Microsoft Graph spreadsheet.</p>
+                    <p class="subtext">
+                       Please open up the Excel sheet at <a href="https://microsoft.sharepoint.com/teams/apppermissionsinaad/_layouts/15/WopiFrame.aspx?sourcedoc=%7b3B137F8C-051B-4D02-9315-E4B916AD0E49%7d&file=Fall%202015%20StringBook.xlsx&action=default">this link</a> and navigate to the <strong>Microsoft Graph</strong> tab.  Copy the information in the table below and paste it into new rows of the sheet.  If you discover that there are already similar permissions to yours, you may want to consult with the Microsoft Graph team to see if re-using permissions is more appropriate.
+                    </p>
+                    <br />
+
+                    <table class="table table-striped table-hover string-table table-condensed" style="width:80%;">
+                        <thead>
+                            <tr>
+                                <th>scopeOrRoleValue</th>
+                                <th>resourceDisplayName</th>
+                                <th>appOnlyDisplayName</th>
+                                <th>appOnlyDescription</th>
+                                <th>adminDisplayName</th>
+                                <th>adminDescription</th>
+                                <th>userConsentDisplayName</th>
+                                <th>userConsentDescription</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="string-table-row" style="display:none;">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>   
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <button id="btn-spreadsheet-table" class="btn btn-primary continue">Done</button>
+                </center>
+            </div>
+
+            <div id="graph-review" style="display:none;">
+                <center>
+                    <p class="lead">Review your permissions with the Microsoft Graph team.</p>
+                    <p class="subtext">
+                       In order to onboard to the Microsoft Graph, you must review your permissions with the <mark>apppermissionsinaad@service.microsoft.com</mark> team.  Please email the team, providing a brief description of your scenario and the permissions involved.  Reference the rows you added to the Excel Sheet, as the team will use these strings to review your permissions.
+                    </p>
+                    <br />
+                    <button id="btn-graph-review" class="btn btn-primary continue">I have recieved approval from the MS Graph team</button>
+                </center>
+            </div>
+
+            <div id="aad-onboarding" style="display:none;">
+                <center>
+                    <p class="lead">Now add your permissions to your app in AAD Onboarding.</p>
+                    <p class="subtext">
+                        Now you must use the Azure AD Onboarding Portal to add your new permissions to your AAD app.
+                        <ol class="subtext" style="text-align:left;">
+                            <li>Go to the <a href="https://aadonboardingsite.cloudapp.net">onboarding portal</a> and sign in with your corporate credentials.</li>
+                            <li>Click on <strong>View My Applications</strong>, and then click on your app.  You must be an owner of the application to proceed.</li>
+                            <li>
+                                Go to near the bottom of the page and under <strong>Environment Details</strong> click one of the <strong>Import from...</strong> buttons. This will get the latest configuration for the application for the targeted environment. So if you're making a change to permissions in PPE, click the PPE import button.
+                            </li>
+                            <li>After the page refreshes, scroll to near the bottom and click <strong>Modify Application</strong></li>
+                            <li>
+                                Now you should be able to make some updates. Permissions exposed by your service are under the <strong>Application Entitlement Claims</strong> section. Scroll to the bottom of that section, and you should see an <strong>Add more...</strong> link. Click that and you can start adding more permissions.
+                            </li>
+                            <li>Enter the information from below for each permission you want to add.</li>
+                            <li>When done, scroll all the way down to the bottom and click Submit for Approval.​</li>                            
+                        </ol>
+                    </p>
+
+                    <br />
+
+                    <table class="table table-striped table-hover aad-onboarding-table table-condensed" style="width:80%;">
+                        <thead>
+                            <tr>
+                                <th>Permission Type</th>
+                                <th>Grant Type</th>
+                                <th>Allowed Member Types</th>
+                                <th>Display Name</th>
+                                <th>Description</th>
+                                <th>User Consent Display Name</th>
+                                <th>User Consent Description</th>
+                                <th>Claim Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="aad-onboarding-table-row" style="display:none;">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>   
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <button id="btn-aad-onboarding" class="btn btn-primary">Done</button>
+                </center>
+            </div>
+
+            <div id="ms-graph-aad-onboarding" style="display:none;">
+                <center>
+                    <p class="lead">Add your scope to the Microsoft Graph app object in Azure AD.</p>
+                    <p class="subtext">
+                        In order to expose your scopes as part of the Microsoft Graph, they must be added to the Microsoft Graph app registration in Azure AD.  Please email <strong>dkershaw</strong> and <strong>yinaa</strong> to have your scopes added.  In the email, make sure to include the information from the table below, which will be required for them to complete the addition.
+                    </p>
+
+                    <table class="table table-striped table-hover msgraph-onboarding-table table-condensed" style="width:80%;">
+                        <thead>
+                            <tr>
+                                <th>Permission Type</th>
+                                <th>Grant Type</th>
+                                <th>Allowed Member Types</th>
+                                <th>Display Name</th>
+                                <th>Description</th>
+                                <th>User Consent Display Name</th>
+                                <th>User Consent Description</th>
+                                <th>Claim Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="msgraph-onboarding-table-row" style="display:none;">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>   
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                    <button id="btn-ms-graph-aad-onboarding" class="btn btn-primary">Done</button>
+                </center>
+            </div>
+
+            <div id="ests-whitelist" style="display:none;">
+                <center>
+                    <p class="lead">Email adfrei to get perms whitelisted</p>
+                    <button id="btn-ests-whitelist" class="btn btn-primary continue">Done</button>
+                </center>
+            </div>
+
+            <div id="ccm-perms-list" style="display:none;">
+                <center>
+                    <p class="lead">Email dastrock to get added to ccm</p>
+                    <button id="btn-ccm-perms-list" class="btn btn-primary">Done</button>
+                </center>
+            </div>
+
+            <div id="xml-org-only" style="display:none;">
+                <center>
+                    <p class="lead">Email dastrock to using XML provided below, with ActionIsDummy</p>
+                    <button id="btn-xml-org-only" class="btn btn-primary continue">Done</button>
+                </center>
+            </div>
+
+            <div id="register-msm" style="display:none;">
+                <center>
+                    <p class="lead">Go register a site in MSM</p>
+                    <button id="btn-register-msm" class="btn btn-primary continue">Done</button>
+                </center>
+            </div>
+
+            <div id="tfs-strings" style="display:none;">
+                <center>
+                    <p class="lead">Go open up a TFS item against Navin w/ generated string below.</p>
+                    <button id="btn-tfs-strings" class="btn btn-primary">Done</button>
+                </center>
+            </div>
+
+            <div id="xml-msa" style="display:none;">
+                <center>
+                    <p class="lead">Email dastrock to using XML provided below, with all MSA options</p>
+                    <button id="btn-xml-msa" class="btn btn-primary continue">Done</button>
+                </center>
+            </div>
+
+            <div id="xml-ms-graph" style="display:none;">
+                <center>
+                    <p class="lead">Email dastrock to using XML provided below, with all MS Graph template</p>
+                    <button id="btn-xml-ms-graph" class="btn btn-primary continue">Done</button>
+                </center>
+            </div>
+
+            <div id="error-must-use-ms-graph" style="display:none;">
+                <center>
+                    <p class="lead">Sorry, in order to support both MSA & AAD users your service must be exposed through MS Graph.</p>
+                </center>
+            </div>
+
+            <div id="monitor-approvals" style="display:none;">
+                <center>
+                    <p class="lead">Monitor each of your submissions to make sure they are approved.</p>
+                    <p class="subtext">
+                       At this point, you should have requested all changes that are necessary to onboard your new scope.  Each step in these instructions requires someone from the identity team to review your submission and implement or approve it.  We recommend that you monitor each request to ensure it is reviewed & approved. Typically, requests are reviewed on a weekly basis, so please give ample time for the identity team to respond.
+                    </p>
+                    <br />
+                    <button id="btn-monitor-approvals" class="btn btn-primary continue">Done</button>
+                </center>
+            </div>
+
+            <div id="monitor-deployments" style="display:none;">
+                <center>
+                    <p class="lead">Monitor the deployment of your changes</p>
+                    <p class="subtext">
+                        After your submissions are approved, the changes must deploy to production along regular release cycles.  You should seek to test out your new scopes as soon as they become available in each respective environment, so that you can identify mistakes as early as possible.
+                    </p>
+                    <p>
+                        Here are typical timelines for each of the changes that you might have submitted.  Note that not all of these steps will be requried for every new scope, only the ones that you completed in these instructions. 
+                    </p>
+
+                    <table class="table table-striped table-hover table-condensed" style="width:80%;">
+                        <thead>
+                            <tr>
+                                <th>Change</th>
+                                <th>Time to INT (MSA)/PPE (AAD) from submission</th>
+                                <th>Time to PROD from submission</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Onboarding a 1st Party app to AAD</td>
+                                <td>2 weeks</td>
+                                <td>2 weeks</td>
+                            </tr>
+                            <tr>
+                                <td>Adding permissions to a 1st Party AAD app</td>
+                                <td>1 week</td>
+                                <td>2 weeks</td>
+                            </tr>
+                            <tr>
+                                <td>Adding scopes to EvoSTS whitelist</td>
+                                <td>1 week</td>
+                                <td>1 week</td>
+                            </tr>
+                            <tr>
+                                <td>Adding scopes to CCM whitelist</td>
+                                <td>1 week</td>
+                                <td>1 week</td>
+                            </tr>
+                            <tr>
+                                <td>Adding offer XML into MSA database</td>
+                                <td>1 week</td>
+                                <td>1 week</td>
+                            </tr>
+                            <tr>
+                                <td>English permission strings available in MSA</td>
+                                <td>1 week</td>
+                                <td>2 weeks</td>
+                            </tr>
+                            <tr>
+                                <td>Localized permission strings available in MSA</td>
+                                <td>2 weeks</td>
+                                <td>4 weeks</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <br />
+                    <button id="btn-monitor-deployments" class="btn btn-primary continue">Done</button>
+                </center>
+            </div>
+
+            <div id="test" style="display:none;">
+                <center>
+                    <p class="lead">Time to test!</p>
+                    <p class="subtext">
+                        Once deployments complete, you can test out your new scopes.  Make sure to verify they work before publishing to developers (you'd be surprised how often people don't check).
+                    </p>
+                    <p class="subtext">
+                        To start over, refresh this page. In the future, if you want to make edits to your scopes, you can follow these instructions once again.
+                    </p>
+                </center>
+            </div>
+            
+        </div>
+        
+        
+        
+        
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <script src="offeronboarding.js"></script>
+    </body>
+</html>
+
