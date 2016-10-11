@@ -415,7 +415,7 @@ msGraphOnboarding.pop = function () {
 msGraphOnboarding.advance = function (selectionId) {
     if (!isMsaUsersEnabled && isAppOnlyPerm) { monitorApprovals.push(); } 
     else if (!isMsaUsersEnabled) { estsWhitelist.push(); } 
-    else if ($msaUsersEnabled) { tfsStrings.push(); }
+    else if (isMsaUsersEnabled) { tfsStrings.push(); }
 };
 
 var ccmPermsList = new Panel("#ccm-perms-list");
@@ -429,8 +429,8 @@ ccmPermsList.push = function () {
 };
 ccmPermsList.advance = function (selectionId) {
     if (!isMsaUsersEnabled && isUsedInMsGraph) { xmlOrgOnly.push(); } 
-    else if (isMsaUsersEnabled && !$aadUsersEnabled) { xmlMsa.push(); } 
-    else if (isMsaUsersEnabled && $aadUsersEnabled) { xmlMsGraph.push(); }
+    else if (isMsaUsersEnabled && !isAADUsersEnabled) { xmlMsa.push(); } 
+    else if (isMsaUsersEnabled && isAADUsersEnabled) { xmlMsGraph.push(); }
 };
 
 var tfsStrings = new Panel("#tfs-strings");
@@ -512,10 +512,91 @@ xmlOrgOnly.pop = function () {
     Panel.prototype.pop.call(this);
 }
 
+var xmlMsa = new Panel("#xml-msa", "#monitor-approvals");
+xmlMsa.push = function () {
+
+    var offerName = scopes[0].value.split('.')[0];
+    var offerDescription = scopes[0].strings.resourceDisplayName;
+
+    this.$jq.find(".offer-name").text(offerName);
+    this.$jq.find(".offer-service").text(offerDescription);
+    this.$jq.find(".site-id").text(siteId);
+    var actionContainer = this.$jq.find("#action-container");
+
+    var template = this.$jq.find("#action-template");
+    scopes.forEach(function (scope) {
+        
+        newOfferAction = template.clone();
+        actionSegments = scope.value.split('.');
+
+        if (Array.isArray(actionSegments)) {
+            actionSegments.shift();
+            actionName = actionSegments.join('.');
+            newOfferAction.find(".action-name").text(actionName);
+        }
+
+        newOfferAction.find(".user-consent-display-name").text(scope.strings.userDisplayName);
+        var userDescription = scope.strings.userDescription.toLowerCase().replace("allows the app to", "{0} will be able to");
+        newOfferAction.find(".user-consent-description").text(userDescription);
+
+        actionContainer.append(newOfferAction);
+        newOfferAction.show();
+    });
+
+    Panel.prototype.push.call(this);    
+};
+xmlMsa.pop = function () {
+    
+    // Clean up old rows in the table
+    this.$jq.find("#action-container").empty();
+
+    // hide the panel
+    Panel.prototype.pop.call(this);
+}
+
+var xmlMsGraph = new Panel("#xml-ms-graph", "#monitor-approvals");
+xmlMsGraph.push = function () {
+
+    var offerName = scopes[0].value.split('.')[0];
+    var offerDescription = scopes[0].strings.resourceDisplayName;
+
+    this.$jq.find(".offer-name").text(offerName);
+    this.$jq.find(".offer-service").text(offerDescription);
+    var actionContainer = this.$jq.find("#action-container");
+
+    var template = this.$jq.find("#action-template");
+    scopes.forEach(function (scope) {
+        
+        newOfferAction = template.clone();
+        actionSegments = scope.value.split('.');
+
+        if (Array.isArray(actionSegments)) {
+            actionSegments.shift();
+            actionName = actionSegments.join('.');
+            newOfferAction.find(".action-name").text(actionName);
+        }
+
+        newOfferAction.find(".user-consent-display-name").text(scope.strings.userDisplayName);
+        var userDescription = scope.strings.userDescription.toLowerCase().replace("allows the app to", "{0} will be able to");
+        newOfferAction.find(".user-consent-description").text(userDescription);
+
+        actionContainer.append(newOfferAction);
+        newOfferAction.show();
+    });
+
+    Panel.prototype.push.call(this);    
+};
+xmlMsGraph.pop = function () {
+    
+    // Clean up old rows in the table
+    this.$jq.find("#action-container").empty();
+
+    // hide the panel
+    Panel.prototype.pop.call(this);
+}
+
 var errorNoUsers = new Panel("#error-no-users");
 var errorConvergedAuth = new Panel("#error-must-use-ms-graph");
-var xmlMsGraph = new Panel("#xml-ms-graph", "#monitor-approvals");
-var xmlMsa = new Panel("#xml-msa", "#monitor-approvals");
 var monitorApprovals = new Panel("#monitor-approvals", "#monitor-deployments");
 var monitorDeployments = new Panel("#monitor-deployments", "#test");
 var test = new Panel("#test");

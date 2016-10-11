@@ -5,7 +5,7 @@
         <title>Offer Onboarding</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css">
-        <link rel="stylesheet" href="offeronboarding.css">
+        <link rel="stylesheet" href="https://msaonboarding.blob.core.windows.net/offers/offeronboarding.css">
     </head>
     <body>
         <a id="back-button" style="display:none;">
@@ -501,7 +501,10 @@
                     <div id="tfs-scope-html" style="display:none;"><div>Action: {action-name}</div><div>Title: {action-title}</div><div>Summary: {action-summary}</div><div>Description: {action-description}</div><div>Environment: INT & PROD</div><div>Logo: Default MS Logo</div><div>Localization: Yes</div><div>Any other special offer properties (i.e., implicit offers): No</div><div><br></div></div>
                     <br />
                     <br />
-                    <br />
+
+                    <p class="subtext">
+                        If you are familiar with the MSA offer schema, you may provide additional information in the TFS item that pertains to your offer.
+                    </p>
 
                     <button id="btn-tfs-strings" class="btn btn-primary">Done</button>
                 </center>
@@ -509,14 +512,122 @@
 
             <div id="xml-msa" style="display:none;">
                 <center>
-                    <p class="lead">Email dastrock to using XML provided below, with all MSA options</p>
+                    <p class="lead">Add your scope to the MSA Offer database</p>
+
+                    <p class="subtext">
+                        In order for your scopes to be enabled in the MSA system, you must create an <code>Offer</code> in the MSA database.  An offer typically represents the entity that your service provides, and corresponds to the first segment of your scope value(s).  We have generated the XML for creating an offer for you below.  Email this XML to <strong>dastrock</strong>, requesting your offer to be created (or updated if you have an existing offer already).
+                    </p>
+
+                    <p class="subtext">
+                        Further details on the schema of this XML is provided at the bottom of this page.
+                    </p>
+
+                    <pre class="xml-block">
+                        &lt;OfferData&gt;
+                        &lt;Offer&gt;
+                            &lt;Name&gt;<span class="offer-name"></span>&lt;/Name&gt;
+                            &lt;Properties&gt;
+                                &lt;OfferStatus&gt;Enabled&lt;/OfferStatus&gt;
+                                &lt;OfferService&gt;<span class="offer-service"></span>&lt;/OfferService&gt;
+                                &lt;OfferSecurityLevel&gt;1&lt;/OfferSecurityLevel&gt;
+                                &lt;ConsentStorageType&gt;1&lt;/ConsentStorageType&gt;
+                                &lt;TargetSiteID&gt;<span class="site-id"></span>&lt;/TargetSiteID&gt;
+                                &lt;TokenTimeLimit&gt;3600&lt;/TokenTimeLimit&gt;
+                                &lt;ConsentDefaultExpirationTime&gt;2147483647&lt;/ConsentDefaultExpirationTime&gt;
+                                &lt;ConsentMaxExpirationTime&gt;2147483647&lt;/ConsentMaxExpirationTime&gt;
+                                &lt;OfferProtocolsSupported&gt;8&lt;/OfferProtocolsSupported&gt;
+                                &lt;AdditionalTargetSiteIDs&gt;&lt;/AdditionalTargetSiteIDs&gt;
+                            &lt;/Properties&gt;
+                            &lt;StringTable&gt;
+                                &lt;Language langID=&quot;EN-US&quot;&gt;
+                                    &lt;OfferTitle&gt;<span class="offer-service"></span>&lt;/OfferTitle&gt;
+                                    &lt;OfferDescription&gt;<span class="offer-service"></span>&lt;/OfferDescription&gt;
+                                    &lt;OfferRootNodeText&gt;<span class="offer-name"></span>&lt;/OfferRootNodeText&gt;
+                                &lt;/Language&gt;
+                            &lt;/StringTable&gt;
+                            &lt;OfferActions&gt;
+                            <span id="action-template" style="display:none;">
+                                &lt;OfferAction&gt;
+                                    &lt;ActionName&gt;<span class="action-name"></span>&lt;/ActionName&gt;
+                                    &lt;ActionStatus&gt;Enabled&lt;/ActionStatus&gt;
+                                    &lt;ActionFlags&gt;0&lt;/ActionFlags&gt;
+                                    &lt;StringTable&gt;
+                                    &lt;Language langID=&quot;EN-US&quot;&gt;
+                                        &lt;ActionTitle&gt;<span class="user-consent-display-name"></span>&lt;/ActionTitle&gt;
+                                        &lt;ActionDescription&gt;<span class="user-consent-description"></span>&lt;/ActionDescription&gt;
+                                    &lt;/Language&gt;
+                                    &lt;/StringTable&gt;
+                                &lt;/OfferAction&gt;
+                            </span>
+                            <span id="action-container"></span>
+                            &lt;/OfferActions&gt;
+                        &lt;/Offer&gt;
+                        &lt;/OfferData&gt;
+                    </pre>   
+
+                    <br />
+
                     <button id="btn-xml-msa" class="btn btn-primary continue">Done</button>
                 </center>
             </div>
 
             <div id="xml-ms-graph" style="display:none;">
                 <center>
-                    <p class="lead">Email dastrock to using XML provided below, with all MS Graph template</p>
+                    <p class="lead">Add your scope to the MSA Offer database</p>
+
+                    <p class="subtext">
+                        In order for your scopes to be enabled for converged auth (a.k.a. the v2.0 endpoint), you must create an <code>Offer</code> in the MSA database.  An offer typically represents the entity that your service provides, and corresponds to the first segment of your scope value(s).  We have generated the XML for creating an offer for you below.  Email this XML to <strong>dastrock</strong>, requesting your offer to be created (or updated if you have an existing offer already).
+                    </p>
+
+                    <p class="subtext">
+                        Further details on the schema of this XML is provided at the bottom of this page.
+                    </p>
+
+                    <pre class="xml-block">
+                        &lt;OfferData&gt;
+                        &lt;Offer&gt;
+                            &lt;Name&gt;<span class="offer-name"></span>&lt;/Name&gt;
+                            &lt;Properties&gt;
+                                &lt;OfferStatus&gt;Enabled&lt;/OfferStatus&gt;
+                                &lt;OfferService&gt;<span class="offer-service"></span>&lt;/OfferService&gt;
+                                &lt;OfferSecurityLevel&gt;1&lt;/OfferSecurityLevel&gt;
+                                &lt;ConsentStorageType&gt;1&lt;/ConsentStorageType&gt;
+                                &lt;TargetSiteID&gt;293577&lt;/TargetSiteID&gt;
+                                &lt;TokenTimeLimit&gt;3600&lt;/TokenTimeLimit&gt;
+                                &lt;ConsentDefaultExpirationTime&gt;2147483647&lt;/ConsentDefaultExpirationTime&gt;
+                                &lt;ConsentMaxExpirationTime&gt;2147483647&lt;/ConsentMaxExpirationTime&gt;
+                                &lt;OfferProtocolsSupported&gt;8&lt;/OfferProtocolsSupported&gt;
+                                &lt;AdditionalTargetSiteIDs&gt;&lt;/AdditionalTargetSiteIDs&gt;
+                            &lt;/Properties&gt;
+                            &lt;StringTable&gt;
+                                &lt;Language langID=&quot;EN-US&quot;&gt;
+                                    &lt;OfferTitle&gt;<span class="offer-service"></span>&lt;/OfferTitle&gt;
+                                    &lt;OfferDescription&gt;<span class="offer-service"></span>&lt;/OfferDescription&gt;
+                                    &lt;OfferRootNodeText&gt;<span class="offer-name"></span>&lt;/OfferRootNodeText&gt;
+                                &lt;/Language&gt;
+                            &lt;/StringTable&gt;
+                            &lt;OfferActions&gt;
+                            <span id="action-template" style="display:none;">
+                                &lt;OfferAction&gt;
+                                    &lt;ActionName&gt;<span class="action-name"></span>&lt;/ActionName&gt;
+                                    &lt;ActionStatus&gt;Enabled&lt;/ActionStatus&gt;
+                                    &lt;ActionFlags&gt;0&lt;/ActionFlags&gt;
+                                    &lt;StringTable&gt;
+                                    &lt;Language langID=&quot;EN-US&quot;&gt;
+                                        &lt;ActionTitle&gt;<span class="user-consent-display-name"></span>&lt;/ActionTitle&gt;
+                                        &lt;ActionDescription&gt;<span class="user-consent-description"></span>&lt;/ActionDescription&gt;
+                                    &lt;/Language&gt;
+                                    &lt;/StringTable&gt;
+                                &lt;/OfferAction&gt;
+                            </span>
+                            <span id="action-container"></span>
+                            &lt;/OfferActions&gt;
+                        &lt;/Offer&gt;
+                        &lt;/OfferData&gt;
+                    </pre>   
+
+                    <br />
+
                     <button id="btn-xml-ms-graph" class="btn btn-primary continue">Done</button>
                 </center>
             </div>
@@ -620,7 +731,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
         <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-        <script src="offeronboarding.js"></script>
+        <script src="https://msaonboarding.blob.core.windows.net/offers/offeronboarding.js"></script>
     </body>
 </html>
 
