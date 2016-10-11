@@ -8,6 +8,7 @@ var scopeStringIndex = 0;
 var isAppOnlyPerm;
 var isAdminOnlyPerm;
 var isUsedInMsGraph;
+var siteId = 0;
 
 // Global controls
 var $backButton = $("#back-button");
@@ -215,6 +216,11 @@ enterStringsTemplate.push = function () {
 };
 
 var msmRegister = new Panel("#register-msm", "#aad-users-enabled");
+msmRegister.advance = function (selectionId) {
+    siteId = this.$jq.find("#site-id").text();
+    Panel.prototype.advance.call(this, selectionId);
+}
+
 var aadRegister = new Panel("#aad-register");
 aadRegister.advance = function(selectionId) {
     if (!isMsaUsersEnabled) { permissionType.push(); }
@@ -388,7 +394,7 @@ msGraphOnboarding.push = function () {
                 $newRow.children()[6].innerHTML = val.strings.userDescription;
             }
         }
-        $stringTableBody.append($newRow);
+        $tableRow.after($newRow);
         $newRow.addClass("msgraph-onboarding-table-row");
         $newRow.show();
     });
@@ -408,28 +414,107 @@ msGraphOnboarding.pop = function () {
 };
 msGraphOnboarding.advance = function (selectionId) {
     if (!isMsaUsersEnabled && isAppOnlyPerm) { monitorApprovals.push(); } 
-    else if (!isMsaUsersEnabled) { $estsWhitelist.push(); } 
-    else if ($msaUsersEnabled) { $tfsStrings.push(); }
+    else if (!isMsaUsersEnabled) { estsWhitelist.push(); } 
+    else if ($msaUsersEnabled) { tfsStrings.push(); }
 };
 
 var ccmPermsList = new Panel("#ccm-perms-list");
+ccmPermsList.push = function () {
+    scopesList = "";
+    scopes.forEach(function (val) {
+        scopesList += val.value + ', ';
+    });
+    this.$jq.find("#scopes-list").text(scopesList);
+    Panel.prototype.push.call(this);
+};
 ccmPermsList.advance = function (selectionId) {
-    if (!isMsaUsersEnabled && isUsedInMsGraph) { $xmlOrgOnly.push(); } 
-    else if (isMsaUsersEnabled && !$aadUsersEnabled) { $xmlMsa.push(); } 
-    else if (isMsaUsersEnabled && $aadUsersEnabled) { $xmlMsGraph.push(); }
+    if (!isMsaUsersEnabled && isUsedInMsGraph) { xmlOrgOnly.push(); } 
+    else if (isMsaUsersEnabled && !$aadUsersEnabled) { xmlMsa.push(); } 
+    else if (isMsaUsersEnabled && $aadUsersEnabled) { xmlMsGraph.push(); }
 };
 
 var tfsStrings = new Panel("#tfs-strings");
+tfsStrings.push = function () {
+
+    var offerTfsTemplate = "http://daipvstf:8080/tfs/ActiveDirectory/MSA/_workItems/create/Task?%5BSystem.Title%5D=%5BOffer+provision%2Fupdate%5D+{item-title}&%5BSystem.AssignedTo%5D=Navindra+Umanee+%3CREDMOND%5Cnumanee%3E&%5BSystem.Description%5D={description-html}&%5BMicrosoft.VSTS.CMMI.TaskType%5D=Ops+Task&%5BSystem.AreaPath%5D=MSA%5CLogin+Experience";
+
+    var runningHtml = "";
+
+    var scopeTfsTemplate = this.$jq.find("#tfs-scope-html").html();
+    scopes.forEach(function (scope) {
+        newSection = scopeTfsTemplate.slice(0);
+        newSection = newSection.replace("{action-name}", scope.value);
+        newSection = newSection.replace("{action-title}", scope.strings.userDisplayName);
+        newSection = newSection.replace("{action-summary}", scope.strings.userDisplayName);
+        var userDescription = scope.strings.userDescription.toLowerCase().replace("allows the app to", "{0} will be able to");
+        newSection = newSection.replace("{action-description}", userDescription);
+        runningHtml += newSection;
+    });
+
+    var url = offerTfsTemplate.replace("{item-title}", scopes[0].value.split('.')[0]);
+    url = url.replace("{description-html}", encodeURIComponent(runningHtml));
+    this.$jq.find("#tfs-link").attr("href", url);
+
+    Panel.prototype.push.call(this);
+};
 tfsStrings.advance = function (selectionId) {
     if (isAADUsersEnabled) { estsWhitelist.push(); }
     else { xmlMsa.push(); }
 }
 
+var estsWhitelist = new Panel("#ests-whitelist", "#ccm-perms-list");
+estsWhitelist.push = function () {
+    var scopesList = "";
+    scopes.forEach(function (val) {
+        scopesList += val.value + ', ';
+    });
+    this.$jq.find("#scopes-list").text(scopesList);
+    Panel.prototype.push.call(this);
+};
+
+var xmlOrgOnly = new Panel("#xml-org-only", "#monitor-approvals");
+xmlOrgOnly.push = function () {
+
+    var offerName = scopes[0].value.split('.')[0];
+    var offerDescription = scopes[0].strings.resourceDisplayName;
+
+    this.$jq.find(".offer-name").text(offerName);
+    this.$jq.find(".offer-service").text(offerDescription);
+    var actionContainer = this.$jq.find("#action-container");
+
+    var template = this.$jq.find("#action-template");
+    scopes.forEach(function (scope) {
+        
+        newOfferAction = template.clone();
+        actionSegments = scope.value.split('.');
+
+        if (Array.isArray(actionSegments)) {
+            actionSegments.shift();
+            actionName = actionSegments.join('.');
+            newOfferAction.find(".action-name").text(actionName);
+        }
+
+        newOfferAction.find(".user-consent-display-name").text(scope.strings.userDisplayName);
+        newOfferAction.find(".user-consent-description").text(scope.strings.userDescription);
+
+        actionContainer.append(newOfferAction);
+        newOfferAction.show();
+    });
+
+    Panel.prototype.push.call(this);    
+};
+xmlOrgOnly.pop = function () {
+    
+    // Clean up old rows in the table
+    this.$jq.find("#action-container").empty();
+
+    // hide the panel
+    Panel.prototype.pop.call(this);
+}
+
 var errorNoUsers = new Panel("#error-no-users");
 var errorConvergedAuth = new Panel("#error-must-use-ms-graph");
-var estsWhitelist = new Panel("#ests-whitelist", "#ccm-perms-list");
 var xmlMsGraph = new Panel("#xml-ms-graph", "#monitor-approvals");
-var xmlOrgOnly = new Panel("#xml-org-only", "#monitor-approvals");
 var xmlMsa = new Panel("#xml-msa", "#monitor-approvals");
 var monitorApprovals = new Panel("#monitor-approvals", "#monitor-deployments");
 var monitorDeployments = new Panel("#monitor-deployments", "#test");

@@ -113,6 +113,7 @@
                         The Azure AD 1st party onboarding process has extensive documentation, rules, and guidelines.  If this is your first time onboarding to Azure AD, you should begin at <a href="http://aka.ms/aadonboarding">the AAD Onboarding Wiki</a>.  Note that onboarding to Azure AD can take several weeks to complete.
                     </p>
 
+                    <br />
                     <button id="btn-aad-register" class="btn btn-primary">I have registered a 1st party Azure AD app</button>
                 </center>
             </div>
@@ -128,7 +129,7 @@
                     <button id="btn-app-only" class="btn btn-default">Application Permissions</button>
                     <button id="btn-delegated" class="btn btn-default">Delegated Permissions</button>
                 </center>
-               </div>
+            </div>
 
             <div id="admin-only" style="display:none;">
                 <center>
@@ -351,42 +352,157 @@
                         </tbody>
                     </table>
 
+                    <p class="subtext">
+                        In emailing <strong>dkershaw</strong> or <strong>yinaa</strong>, ask them to provide permission IDs for your scopes upon completion.  There should be two unique guids for each of your scopes, one for PROD and one for PPE.  You will need these IDs in a later step.
+                    </p>
 
+                    <br />
                     <button id="btn-ms-graph-aad-onboarding" class="btn btn-primary">Done</button>
                 </center>
             </div>
 
             <div id="ests-whitelist" style="display:none;">
                 <center>
-                    <p class="lead">Email adfrei to get perms whitelisted</p>
+                    <p class="lead">Whitelist your scopes for use with converged auth, part I.</p>
+                    <p class="subtext">
+                        In order for your scopes to be enabled for use with the converged authentication endpoint (a.k.a. v2.0 endpoint), they must be added to a whitelist in EvoSTS, the service on which the converged auth endpoint runs.  Please email <strong>adfrei</strong> to add your scopes to the EvoSTS whitelist.  Be sure to include the following information:
+                    </p>
+
+                    <ul class="subtext subtext-list">
+                        <li>Scope values: <mark id="scopes-list"></mark></li>
+                        <li>Resource value(s): <mark id="resource-list">https://graph.microsoft.com</mark></li>
+                    </ul>
+
+                    <br />
                     <button id="btn-ests-whitelist" class="btn btn-primary continue">Done</button>
                 </center>
             </div>
 
             <div id="ccm-perms-list" style="display:none;">
                 <center>
-                    <p class="lead">Email dastrock to get added to ccm</p>
+                    <p class="lead">Whitelist your scopes for use with converged auth, part II.</p>
+                    <p class="subtext">
+                        In order for your scopes to be enabled for use with the converged authentication endpoint (a.k.a. v2.0 endpoint), they must be added to a whitelist in CCM, the configuration system for MSA.  Please email <strong>dastrock</strong> to add your scopes to the CCM whitelist.  Be sure to include the following information:
+                    </p>
+                    
+                    <ul class="subtext subtext-list">
+                        <li>Scope values: <mark id="scopes-list"></mark></li>
+                        <li>The <strong>PROD</strong> Microsoft Graph permission IDs for each of your new scopes.  These guids will be generated after your scopes have been added to the Microsoft Graph app object by the Microsoft Graph team (which you should have already completed). You will have to ask the Microsoft Graph team to retreive these permissions for you.</li>
+                        <li>The <strong>PPE</strong> Microsoft Graph permission IDs for each of your new scopes.  The guids will differ across PPE and PROD.  So, each scope you submit in this step should be accompanied by <strong>2</strong> permission IDs.</li>
+                    </ul>
+
+                    <br />
                     <button id="btn-ccm-perms-list" class="btn btn-primary">Done</button>
                 </center>
             </div>
 
             <div id="xml-org-only" style="display:none;">
                 <center>
-                    <p class="lead">Email dastrock to using XML provided below, with ActionIsDummy</p>
+                    <p class="lead">Add your scope to the MSA Offer database</p>
+
+                    <p class="subtext">
+                        In order for your scopes to be enabled for use with the converged authentication endpoint (a.k.a. v2.0 endpoint), you must create an <code>Offer</code> in the MSA database.  An offer typically represents the entity that your service provides, and corresponds to the first segment of your scope values.  We have generated the XML for creating an offer for you below.  Email this XML to <strong>dastrock</strong>, requesting your offer to be created (or updated if you have an existing offer already).
+                    </p>
+
+                    <p class="subtext">
+                        Further details on the schema of this XML is provided at the bottom of this page.
+                    </p>
+
+                    <pre class="xml-block">
+                        &lt;OfferData&gt;
+                        &lt;Offer&gt;
+                            &lt;Name&gt;<span class="offer-name"></span>&lt;/Name&gt;
+                            &lt;Properties&gt;
+                                &lt;OfferStatus&gt;Enabled&lt;/OfferStatus&gt;
+                                &lt;OfferService&gt;<span class="offer-service"></span>&lt;/OfferService&gt;
+                                &lt;OfferSecurityLevel&gt;1&lt;/OfferSecurityLevel&gt;
+                                &lt;ConsentStorageType&gt;1&lt;/ConsentStorageType&gt;
+                                &lt;TargetSiteID&gt;293577&lt;/TargetSiteID&gt;
+                                &lt;TokenTimeLimit&gt;3600&lt;/TokenTimeLimit&gt;
+                                &lt;ConsentDefaultExpirationTime&gt;2147483647&lt;/ConsentDefaultExpirationTime&gt;
+                                &lt;ConsentMaxExpirationTime&gt;2147483647&lt;/ConsentMaxExpirationTime&gt;
+                                &lt;OfferProtocolsSupported&gt;8&lt;/OfferProtocolsSupported&gt;
+                                &lt;AdditionalTargetSiteIDs&gt;&lt;/AdditionalTargetSiteIDs&gt;
+                            &lt;/Properties&gt;
+                            &lt;StringTable&gt;
+                                &lt;Language langID=&quot;EN-US&quot;&gt;
+                                    &lt;OfferTitle&gt;<span class="offer-service"></span>&lt;/OfferTitle&gt;
+                                    &lt;OfferDescription&gt;<span class="offer-service"></span>&lt;/OfferDescription&gt;
+                                    &lt;OfferRootNodeText&gt;<span class="offer-name"></span>&lt;/OfferRootNodeText&gt;
+                                &lt;/Language&gt;
+                            &lt;/StringTable&gt;
+                            &lt;OfferActions&gt;
+                            <span id="action-template" style="display:none;">
+                                &lt;OfferAction&gt;
+                                    &lt;ActionName&gt;<span class="action-name"></span>&lt;/ActionName&gt;
+                                    &lt;ActionStatus&gt;Enabled&lt;/ActionStatus&gt;
+                                    &lt;ActionFlags&gt;0&lt;/ActionFlags&gt;
+                                    &lt;ActionIsDummy&gt;1&lt;/ActionIsDummy&gt;
+                                    &lt;StringTable&gt;
+                                    &lt;Language langID=&quot;EN-US&quot;&gt;
+                                        &lt;ActionTitle&gt;<span class="user-consent-display-name"></span>&lt;/ActionTitle&gt;
+                                        &lt;ActionDescription&gt;<span class="user-consent-description"></span>&lt;/ActionDescription&gt;
+                                    &lt;/Language&gt;
+                                    &lt;/StringTable&gt;
+                                &lt;/OfferAction&gt;
+                            </span>
+                            <span id="action-container"></span>
+                            &lt;/OfferActions&gt;
+                        &lt;/Offer&gt;
+                        &lt;/OfferData&gt;
+                    </pre>   
+
+                    <br />
+
                     <button id="btn-xml-org-only" class="btn btn-primary continue">Done</button>
                 </center>
             </div>
 
             <div id="register-msm" style="display:none;">
                 <center>
-                    <p class="lead">Go register a site in MSM</p>
+                    <p class="lead">Register a site in MSA</p>
+
+                    <p class="subtext">
+                        Registering a site in MSA is relatively straightforward, and can be done self-service via the <a href="https://msm.live.com">MSM Portal</a>.  If this is your first time onboarding a site in MSA, you should refer to the documentation at //msa for guidance.  If you have an existing site, you should not create a new one, but rather re-use your existing site.
+                    </p>
+
+                    <p class="subtext">
+                        Once you've registered your site, enter your site ID in the field below:
+                    </p>
+
+
+                    <div class="container strings">
+                        <form class="form-horizontal">
+                            <div class="form-group" id="siteID">
+                                <label class="col-sm-4 control-label" for="site-id">Site ID</label>
+                                <div class="col-sm-4">
+                                    <input id="site-id" type="text" class="form-control" placeholder="201645" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <br />
+
                     <button id="btn-register-msm" class="btn btn-primary continue">Done</button>
                 </center>
             </div>
 
             <div id="tfs-strings" style="display:none;">
                 <center>
-                    <p class="lead">Go open up a TFS item against Navin w/ generated string below.</p>
+                    <p class="lead">Add your permission strings into the MSA system</p>
+
+                    <p class="subtext">
+                        In order for MSA to be able to display permissions in the MSA users consent UX, your permissions strings must be localized and checked into the MSA codebase.  Click the link below (on corpnet only) to open up a TFS item against the MSA team.  You can use this TFS item to ensure that the strings are checked into the MSA codebase in a timely manner.
+                    </p>
+
+                    <br />                    
+                    <a id="tfs-link" target="_blank">Create TFS Item</a>
+                    <div id="tfs-scope-html" style="display:none;"><div>Action: {action-name}</div><div>Title: {action-title}</div><div>Summary: {action-summary}</div><div>Description: {action-description}</div><div>Environment: INT & PROD</div><div>Logo: Default MS Logo</div><div>Localization: Yes</div><div>Any other special offer properties (i.e., implicit offers): No</div><div><br></div></div>
+                    <br />
+                    <br />
+                    <br />
+
                     <button id="btn-tfs-strings" class="btn btn-primary">Done</button>
                 </center>
             </div>
@@ -495,7 +611,6 @@
                     </p>
                 </center>
             </div>
-            
         </div>
         
         

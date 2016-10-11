@@ -20,7 +20,7 @@
 }
 
 .strings {
-    width:1000px;
+    width:80%;
 }
 
 .subtext {
@@ -34,4 +34,9 @@
 .btn-success,
 .btn-danger {
     width: 100px;
+}
+
+.xml-block {
+    text-align: left;
+    height: 300px;
 }
