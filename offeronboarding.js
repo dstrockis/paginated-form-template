@@ -217,7 +217,7 @@ enterStringsTemplate.push = function () {
 
 var msmRegister = new Panel("#register-msm", "#aad-users-enabled");
 msmRegister.advance = function (selectionId) {
-    siteId = this.$jq.find("#site-id").text();
+    siteId = this.$jq.find("#site-id").val();
     Panel.prototype.advance.call(this, selectionId);
 }
 
@@ -373,7 +373,7 @@ msGraphOnboarding.push = function () {
             $newRow.children()[1].innerHTML = "Admin";
             $newRow.children()[2].innerHTML = "Application";
             $newRow.children()[3].innerHTML = val.strings.appOnlyDisplayName;
-            $newRow.children()[4].innerHTML = val.srings.appOnlyDescription;
+            $newRow.children()[4].innerHTML = val.strings.appOnlyDescription;
             $newRow.children()[5].innerHTML = "n/a";
             $newRow.children()[6].innerHTML = "n/a";
             $newRow.children()[7].innerHTML = val.value;
@@ -436,7 +436,7 @@ ccmPermsList.advance = function (selectionId) {
 var tfsStrings = new Panel("#tfs-strings");
 tfsStrings.push = function () {
 
-    var offerTfsTemplate = "http://daipvstf:8080/tfs/ActiveDirectory/MSA/_workItems/create/Task?%5BSystem.Title%5D=%5BOffer+provision%2Fupdate%5D+{item-title}&%5BSystem.AssignedTo%5D=Navindra+Umanee+%3CREDMOND%5Cnumanee%3E&%5BSystem.Description%5D={description-html}&%5BMicrosoft.VSTS.CMMI.TaskType%5D=Ops+Task&%5BSystem.AreaPath%5D=MSA%5CLogin+Experience";
+    var offerTfsTemplate = "https://identitydivision.visualstudio.com/CAT/Consumer%20Service%20Engineering/_workItems/create/Task?%5BSystem.Title%5D=%5BOffer+provision%2Fupdate%5D+{item-title}&%5BSystem.AssignedTo%5D=numanee@microsoft.com&%5BSystem.Description%5D={description-html}&%5BSystem.AreaPath%5D=CAT%5CConsumer+Service+Engineering";
 
     var runningHtml = "";
 
